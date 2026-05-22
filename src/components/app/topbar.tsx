@@ -1,9 +1,11 @@
 import { Search, Bell, Menu, Moon, Sun } from "lucide-react";
 import { useEffect, useState } from "react";
+import { useNavigate } from "@tanstack/react-router";
 import { useRole, ROLES, type Role } from "./role-context";
 
 export function TopBar({ onMenu }: { onMenu: () => void }) {
   const { role, setRole, current } = useRole();
+  const navigate = useNavigate();
   const [dark, setDark] = useState(false);
 
   useEffect(() => {
