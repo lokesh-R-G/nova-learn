@@ -40,7 +40,11 @@ export function TopBar({ onMenu }: { onMenu: () => void }) {
 
         <select
           value={role}
-          onChange={(e) => setRole(e.target.value as Role)}
+          onChange={(e) => {
+            const r = e.target.value as Role;
+            setRole(r);
+            navigate({ to: `/${r}` as any });
+          }}
           aria-label="Switch role"
           className="rounded-full border border-border bg-card px-3 py-1.5 text-xs font-semibold text-foreground shadow-sm outline-none focus:ring-2 focus:ring-brand-500/30"
         >
