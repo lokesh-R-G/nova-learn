@@ -140,7 +140,7 @@ export function AppSidebar({
                 return (
                   <Link
                     key={it.to}
-                    to={it.to}
+                    to={it.to as string}
                     className={cn(
                       "group flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
                       active
