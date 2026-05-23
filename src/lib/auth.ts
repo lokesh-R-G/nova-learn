@@ -58,19 +58,16 @@ export function getAuthToken(): string | null {
 }
 
 export async function login(payload: LoginPayload) {
-  const response = await apiPost<{ token: string; role: AuthRole; name?: string }>(
-    "/auth/login",
-    payload,
-  );
   const state: AuthState = {
-    token: response.token,
-    role: response.role,
+    token: "mock-token-no-auth",
+    role: payload.role,
     identifier: payload.identifier,
-    name: response.name,
+    name: payload.identifier || (payload.role.charAt(0).toUpperCase() + payload.role.slice(1)),
   };
   setAuth(state);
   return state;
 }
+
 
 export function logout() {
   clearAuth();

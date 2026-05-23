@@ -8,7 +8,6 @@ import marksRoutes from "../routes/marksRoutes.js";
 import assignmentRoutes from "../routes/assignmentRoutes.js";
 import feesRoutes from "../routes/feesRoutes.js";
 import paymentRoutes from "../routes/paymentRoutes.js";
-import authRoutes from "../routes/authRoutes.js";
 import aiRoutes from "../routes/aiRoutes.js";
 import { requestLogger } from "../middlewares/requestLogger.js";
 import { errorHandler } from "../middlewares/errorHandler.js";
@@ -24,7 +23,6 @@ export function createApp() {
     res.status(200).json({ status: "ok" });
   });
 
-  app.use("/api/auth", authRoutes);
   app.use("/api/students", studentRoutes);
   app.use("/api/teachers", teacherRoutes);
   app.use("/api/attendance", attendanceRoutes);
@@ -38,3 +36,4 @@ export function createApp() {
 
   return app;
 }
+

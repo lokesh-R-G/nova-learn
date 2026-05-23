@@ -4,6 +4,18 @@ import { fileURLToPath } from "node:url";
 import dotenv from "dotenv";
 import mongoose from "mongoose";
 import csvParser from "csv-parser";
+import { connectDatabase } from "./services/db.js";
+import { Class } from "./models/Class.js";
+import { Teacher } from "./models/Teacher.js";
+import { Student } from "./models/Student.js";
+import { Parent } from "./models/Parent.js";
+import { Mapping } from "./models/Mapping.js";
+import { Attendance } from "./models/Attendance.js";
+import { Marks } from "./models/Marks.js";
+import { Fees } from "./models/Fees.js";
+import { Payment } from "./models/Payment.js";
+import { Assignment } from "./models/Assignment.js";
+import { Submission } from "./models/Submission.js";
 
 dotenv.config();
 
@@ -17,123 +29,6 @@ const DB_NAME = ENV.dbName;
 const BATCH_SIZE = ENV.batchSize;
 const CLEAR_EXISTING = ENV.seedClear;
 const NODE_ENV = ENV.nodeEnv;
-
-const studentSchema = new mongoose.Schema(
-  {
-    student_id: { type: String, required: true, unique: true, index: true },
-    class_id: { type: String, required: true, index: true },
-    name: { type: String, required: true },
-  },
-  { collection: "students" },
-);
-
-const teacherSchema = new mongoose.Schema(
-  {
-    teacher_id: { type: String, required: true, unique: true, index: true },
-    name: { type: String, required: true },
-    subject: { type: String, required: true },
-  },
-  { collection: "teachers" },
-);
-
-const parentSchema = new mongoose.Schema(
-  {
-    parent_id: { type: String, required: true, unique: true, index: true },
-    student_id: { type: String, required: true, index: true },
-    name: { type: String, required: true },
-  },
-  { collection: "parents" },
-);
-
-const classSchema = new mongoose.Schema(
-  {
-    class_id: { type: String, required: true, unique: true, index: true },
-    grade: { type: Number, required: true },
-    section: { type: String, required: true },
-  },
-  { collection: "classes" },
-);
-
-const mappingSchema = new mongoose.Schema(
-  {
-    class_id: { type: String, required: true, index: true },
-    subject: { type: String, required: true },
-    teacher_id: { type: String, required: true, index: true },
-  },
-  { collection: "class_subject_teacher" },
-);
-
-const attendanceSchema = new mongoose.Schema(
-  {
-    student_id: { type: String, required: true, index: true },
-    class_id: { type: String, required: true, index: true },
-    date: { type: Date, required: true },
-    status: { type: String, required: true },
-  },
-  { collection: "attendance" },
-);
-
-const marksSchema = new mongoose.Schema(
-  {
-    student_id: { type: String, required: true, index: true },
-    subject: { type: String, required: true },
-    exam: { type: String, required: true },
-    marks: { type: Number, required: true },
-    max_marks: { type: Number, required: true },
-  },
-  { collection: "marks" },
-);
-
-const feesSchema = new mongoose.Schema(
-  {
-    student_id: { type: String, required: true, unique: true, index: true },
-    total_fee: { type: Number, required: true },
-    paid: { type: Number, required: true },
-    balance: { type: Number, required: true },
-  },
-  { collection: "fees" },
-);
-
-const paymentsSchema = new mongoose.Schema(
-  {
-    student_id: { type: String, required: true, index: true },
-    amount: { type: Number, required: true },
-    method: { type: String, required: true },
-    date: { type: Date, required: true },
-  },
-  { collection: "payments" },
-);
-
-const assignmentsSchema = new mongoose.Schema(
-  {
-    assignment_id: { type: String, required: true, unique: true, index: true },
-    class_id: { type: String, required: true, index: true },
-    subject: { type: String, required: true },
-    title: { type: String, required: true },
-  },
-  { collection: "assignments" },
-);
-
-const submissionsSchema = new mongoose.Schema(
-  {
-    assignment_id: { type: String, required: true, index: true },
-    student_id: { type: String, required: true, index: true },
-    marks: { type: Number, required: true },
-  },
-  { collection: "submissions" },
-);
-
-const Student = mongoose.model("Student", studentSchema);
-const Teacher = mongoose.model("Teacher", teacherSchema);
-const Parent = mongoose.model("Parent", parentSchema);
-const Class = mongoose.model("Class", classSchema);
-const Mapping = mongoose.model("ClassSubjectTeacher", mappingSchema);
-const Attendance = mongoose.model("Attendance", attendanceSchema);
-const Marks = mongoose.model("Marks", marksSchema);
-const Fees = mongoose.model("Fees", feesSchema);
-const Payments = mongoose.model("Payments", paymentsSchema);
-const Assignments = mongoose.model("Assignments", assignmentsSchema);
-const Submissions = mongoose.model("Submissions", submissionsSchema);
 
 const toNumber = (value) => {
   const num = Number(value);
@@ -284,9 +179,12 @@ async function run() {
   }
 
   try {
-    await mongoose.connect(MONGODB_URI, { dbName: DB_NAME });
+    const connection = await connectDatabase({
+      mongoUri: MONGODB_URI,
+      dbName: DB_NAME,
+    });
     console.log("MongoDB connection established.");
-    console.log(`Connected database: ${mongoose.connection.name}`);
+    console.log(`Connected database: ${connection.name}`);
   } catch (error) {
     console.error("MongoDB connection failed.");
     console.error(error);
@@ -371,7 +269,7 @@ async function run() {
       }),
     },
     {
-      model: Payments,
+      model: Payment,
       fileName: "payments_full.csv",
       mapRow: (row) => ({
         student_id: trim(row.student_id),
@@ -381,7 +279,7 @@ async function run() {
       }),
     },
     {
-      model: Assignments,
+      model: Assignment,
       fileName: "assignments_full.csv",
       mapRow: (row) => ({
         assignment_id: trim(row.assignment_id),
@@ -391,7 +289,7 @@ async function run() {
       }),
     },
     {
-      model: Submissions,
+      model: Submission,
       fileName: "submissions_full.csv",
       mapRow: (row) => ({
         assignment_id: trim(row.assignment_id),
