@@ -2,11 +2,13 @@ import { Search, Bell, Menu, Moon, Sun } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { useRole, ROLES, type Role } from "./role-context";
+import { useAuth } from "@/hooks/use-auth";
 
 export function TopBar({ onMenu }: { onMenu: () => void }) {
   const { role, setRole, current } = useRole();
   const navigate = useNavigate();
   const [dark, setDark] = useState(false);
+  const { auth, logout } = useAuth();
 
   useEffect(() => {
     document.documentElement.classList.toggle("dark", dark);
@@ -33,6 +35,14 @@ export function TopBar({ onMenu }: { onMenu: () => void }) {
       </div>
 
       <div className="flex items-center gap-3 md:gap-5">
+                {auth && (
+                  <button
+                    onClick={logout}
+                    className="hidden rounded-full border border-border px-3 py-1.5 text-xs font-semibold text-foreground hover:bg-secondary md:inline-flex"
+                  >
+                    Sign out
+                  </button>
+                )}
         <div className="hidden items-center gap-2 rounded-full bg-secondary px-3 py-1 md:flex">
           <span className="size-2 rounded-full bg-success" />
           <span className="text-xs font-medium text-muted-foreground">Operational</span>

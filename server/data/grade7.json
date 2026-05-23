@@ -1,0 +1,39 @@
+{
+  "grade": 7,
+  "subjects": {
+    "Mathematics": [
+      {
+        "id": "math-algebra-intro",
+        "title": "Introduction to Algebra",
+        "text": "Algebra is a branch of mathematics that uses symbols like x or y to represent unknown numbers. You can form equations such as x + 5 = 12 to find the value of the unknown. The goal is to keep both sides balanced while solving for the variable."
+      },
+      {
+        "id": "math-integers",
+        "title": "Integers and Operations",
+        "text": "Integers include positive numbers, negative numbers, and zero. When adding a negative number, you can think of it as subtracting. Multiplying two negatives gives a positive result, while multiplying a positive and a negative gives a negative result."
+      },
+      {
+        "id": "math-ratios",
+        "title": "Ratios and Proportions",
+        "text": "A ratio compares two quantities, such as 3:2. A proportion states that two ratios are equal, like 3/2 = 6/4. You can solve proportions by cross-multiplying to find missing values."
+      }
+    ],
+    "Science": [
+      {
+        "id": "sci-cells",
+        "title": "Cells and Life",
+        "text": "All living things are made of cells. Cells have parts called organelles, like the nucleus, which controls cell activities. Plant cells have cell walls and chloroplasts, while animal cells do not."
+      },
+      {
+        "id": "sci-energy",
+        "title": "Forms of Energy",
+        "text": "Energy can appear as light, heat, sound, electrical, or chemical energy. Energy can change from one form to another, such as electrical energy turning into light in a bulb."
+      },
+      {
+        "id": "sci-ecosystems",
+        "title": "Ecosystems",
+        "text": "An ecosystem includes living organisms and their environment. Producers like plants make food using sunlight. Consumers eat other organisms, and decomposers break down dead matter to recycle nutrients."
+      }
+    ]
+  }
+}

@@ -4,6 +4,10 @@ import { motion } from "framer-motion";
 import { Sparkles, Send, Atom, Calculator, FlaskConical, Globe, Languages, Wand2 } from "lucide-react";
 import { Card, PageHeader, Badge } from "@/components/app/ui-bits";
 import { cn } from "@/lib/utils";
+import { useAIChat } from "@/hooks/api-hooks";
+import { useAuth } from "@/hooks/use-auth";
+import { resolveStudentId } from "@/lib/defaults";
+import { RequireRole } from "@/components/app/require-role";
 
 export const Route = createFileRoute("/assistant")({
   head: () => ({
@@ -37,35 +41,82 @@ const SEED: Record<string, Msg[]> = {
   eng: [{ id: 1, role: "ai", text: "Hi! Need help analysing a poem, writing an essay, or revising vocabulary?" }],
 };
 
+const SUBJECT_MAP: Record<string, string> = {
+  physics: "Science",
+  math: "Mathematics",
+  chem: "Science",
+  hist: "History",
+  eng: "English",
+};
+
 function Assistant() {
   const [active, setActive] = useState("math");
   const [conv, setConv] = useState<Record<string, Msg[]>>(SEED);
   const [draft, setDraft] = useState("");
+  const [isTyping, setIsTyping] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const { auth } = useAuth();
+  const { mutateAsync, isPending } = useAIChat();
 
   const messages = conv[active] ?? [];
+  const studentId = resolveStudentId(auth);
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
   }, [messages.length, active]);
 
-  function send(text?: string) {
+  function updateMessage(id: number, text: string) {
+    setConv((c) => {
+      const list = c[active] ?? [];
+      return {
+        ...c,
+        [active]: list.map((msg) => (msg.id === id ? { ...msg, text } : msg)),
+      };
+    });
+  }
+
+  async function typeOutMessage(id: number, text: string) {
+    setIsTyping(true);
+    return new Promise<void>((resolve) => {
+      let index = 0;
+      const timer = window.setInterval(() => {
+        index += 1;
+        updateMessage(id, text.slice(0, index));
+        if (index >= text.length) {
+          window.clearInterval(timer);
+          setIsTyping(false);
+          resolve();
+        }
+      }, 12);
+    });
+  }
+
+  async function send(text?: string) {
     const t = (text ?? draft).trim();
     if (!t) return;
     const userMsg: Msg = { id: Date.now(), role: "user", text: t };
     setConv((c) => ({ ...c, [active]: [...(c[active] ?? []), userMsg] }));
     setDraft("");
-    setTimeout(() => {
-      const reply: Msg = {
-        id: Date.now() + 1, role: "ai",
-        text: "Great question — here's a short walkthrough. Step 1: identify the technique. Step 2: apply it carefully. Want me to generate 3 similar problems for practice?",
-      };
-      setConv((c) => ({ ...c, [active]: [...(c[active] ?? []), reply] }));
-    }, 700);
+    const aiId = Date.now() + 1;
+    const reply: Msg = { id: aiId, role: "ai", text: "" };
+    setConv((c) => ({ ...c, [active]: [...(c[active] ?? []), reply] }));
+
+    try {
+      const subjectName = SUBJECT_MAP[active] ?? subjects.find((s) => s.id === active)?.name ?? active;
+      const response = await mutateAsync({
+        student_id: studentId,
+        subject: subjectName,
+        question: t,
+      });
+      await typeOutMessage(aiId, response.answer);
+    } catch (error) {
+      updateMessage(aiId, error instanceof Error ? error.message : "AI request failed.");
+      setIsTyping(false);
+    }
   }
 
   return (
-    <>
+    <RequireRole roles={["student", "teacher", "admin"]}>
       <PageHeader
         title="Learning Assistant"
         subtitle="Your personal AI tutor — subject by subject"
@@ -109,6 +160,7 @@ function Assistant() {
             <button
               onClick={() => send("Generate 5 practice questions for me.")}
               className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-card px-3 py-1.5 text-xs font-semibold hover:bg-secondary"
+              disabled={isPending || isTyping}
             >
               <Wand2 className="size-3.5" /> Generate Questions
             </button>
@@ -132,7 +184,7 @@ function Assistant() {
                     ? "rounded-tl-sm bg-secondary text-foreground"
                     : "rounded-tr-sm bg-brand-600 text-brand-foreground",
                 )}>
-                  {m.text}
+                  {m.text || (m.role === "ai" && (isPending || isTyping) ? "…" : "")}
                 </div>
               </motion.div>
             ))}
@@ -157,10 +209,12 @@ function Assistant() {
                 onChange={(e) => setDraft(e.target.value)}
                 placeholder="Ask anything about your subject…"
                 className="flex-1 bg-transparent px-2 text-sm outline-none placeholder:text-muted-foreground"
+                disabled={isPending || isTyping}
               />
               <button
                 type="submit"
                 className="flex size-9 items-center justify-center rounded-xl bg-brand-600 text-brand-foreground shadow-sm shadow-brand-600/30 transition hover:bg-brand-700"
+                disabled={isPending || isTyping}
               >
                 <Send className="size-4" />
               </button>
@@ -168,6 +222,6 @@ function Assistant() {
           </div>
         </Card>
       </div>
-    </>
+    </RequireRole>
   );
 }

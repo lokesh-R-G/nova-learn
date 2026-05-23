@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { motion } from "framer-motion";
+import { useMemo } from "react";
 import {
   AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer,
   BarChart, Bar, PieChart, Pie, Cell, CartesianGrid, Legend,
@@ -9,6 +10,9 @@ import {
   Card, PageHeader, PrimaryButton, SecondaryButton,
   SectionTitle, StatCard, Badge,
 } from "@/components/app/ui-bits";
+import { RequireRole } from "@/components/app/require-role";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useFeesQueries, useStudents, useTeachers } from "@/hooks/api-hooks";
 
 export const Route = createFileRoute("/admin")({
   head: () => ({
@@ -36,12 +40,6 @@ const classData = [
   { c: "12-A", avg: 87 }, { c: "12-B", avg: 80 },
 ];
 
-const feeMix = [
-  { name: "Collected", value: 842, color: "var(--brand-600)" },
-  { name: "Pending", value: 138, color: "var(--warning)" },
-  { name: "Overdue", value: 42, color: "var(--danger)" },
-];
-
 const timetable = [
   { time: "08:30", subject: "Advanced Physics", room: "Lab 3 • Dr. Lee", grade: "12-B" },
   { time: "10:15", subject: "Calculus I", room: "Room 204 • Mrs. Park", grade: "11-A" },
@@ -50,8 +48,47 @@ const timetable = [
 ];
 
 function AdminDashboard() {
+  const { data: students, isLoading: studentsLoading, error: studentsError } = useStudents();
+  const { data: teachers, isLoading: teachersLoading, error: teachersError } = useTeachers();
+  const studentIds = useMemo(
+    () => (students ?? []).slice(0, 40).map((s) => s.student_id),
+    [students],
+  );
+  const feesQueries = useFeesQueries(studentIds);
+  const feesData = feesQueries.map((q) => q.data).filter(Boolean);
+
+  const totals = feesData.reduce(
+    (acc, fee) => {
+      acc.collected += fee.paid;
+      acc.pending += fee.balance;
+      acc.total += fee.total_fee;
+      return acc;
+    },
+    { collected: 0, pending: 0, total: 0 },
+  );
+
+  const feeMix = [
+    { name: "Collected", value: Math.round(totals.collected / 1000), color: "var(--brand-600)" },
+    { name: "Pending", value: Math.round(totals.pending / 1000), color: "var(--warning)" },
+    { name: "Overdue", value: 0, color: "var(--danger)" },
+  ];
+
+  const hasError = studentsError || teachersError || feesQueries.some((q) => q.isError);
+
+  const recentFees = feesData.slice(0, 4).map((fee) => {
+    const student = students?.find((s) => s.student_id === fee.student_id);
+    return {
+      id: fee.student_id,
+      who: student?.name ?? fee.student_id,
+      cat: "Tuition Fee",
+      d: "—",
+      amt: `$${fee.paid.toLocaleString()}.00`,
+      s: fee.balance === 0 ? "Paid" : "Pending",
+    };
+  });
+
   return (
-    <>
+    <RequireRole roles={["admin"]}>
       <PageHeader
         title="Institutional Overview"
         subtitle="Performance analytics for Q3 Academic Cycle"
@@ -63,11 +100,17 @@ function AdminDashboard() {
         }
       />
 
+      {hasError && (
+        <Card className="mb-6 border-danger/40 bg-danger/5">
+          <p className="text-sm text-danger">Unable to load admin analytics.</p>
+        </Card>
+      )}
+
       <div className="grid grid-cols-2 gap-4 md:grid-cols-4 md:gap-6">
-        <StatCard index={0} label="Avg. Teacher Score" value="4.82" delta="+12%" progress={82} />
-        <StatCard index={1} label="Student Retention" value="96.4%" delta="+0.8%" progress={96} progressTone="success" />
-        <StatCard index={2} label="Fee Realization" value="$842k" delta="Target $900k" deltaTone="neutral" progress={78} progressTone="warning" />
-        <StatCard index={3} label="Active Classes" value="124" delta="Live Now" deltaTone="neutral" progress={70} />
+        <StatCard index={0} label="Total Teachers" value={teachersLoading ? "—" : `${teachers?.length ?? 0}`} delta="" progress={82} />
+        <StatCard index={1} label="Total Students" value={studentsLoading ? "—" : `${students?.length ?? 0}`} delta="" progress={96} progressTone="success" />
+        <StatCard index={2} label="Fee Realization" value={`$${Math.round(totals.collected / 1000)}k`} delta="" deltaTone="neutral" progress={78} progressTone="warning" />
+        <StatCard index={3} label="Pending Balance" value={`$${Math.round(totals.pending / 1000)}k`} delta="" deltaTone="neutral" progress={70} />
       </div>
 
       <div className="mt-8 grid grid-cols-1 gap-6 lg:grid-cols-3">
@@ -148,13 +191,17 @@ function AdminDashboard() {
           <SectionTitle>Fee Summary</SectionTitle>
           <div className="flex items-center gap-4">
             <div className="h-40 w-40 shrink-0">
-              <ResponsiveContainer>
-                <PieChart>
-                  <Pie data={feeMix} dataKey="value" innerRadius={42} outerRadius={64} paddingAngle={3} stroke="none">
-                    {feeMix.map((s) => <Cell key={s.name} fill={s.color} />)}
-                  </Pie>
-                </PieChart>
-              </ResponsiveContainer>
+              {feesQueries.some((q) => q.isLoading) ? (
+                <Skeleton className="h-full w-full rounded-full" />
+              ) : (
+                <ResponsiveContainer>
+                  <PieChart>
+                    <Pie data={feeMix} dataKey="value" innerRadius={42} outerRadius={64} paddingAngle={3} stroke="none">
+                      {feeMix.map((s) => <Cell key={s.name} fill={s.color} />)}
+                    </Pie>
+                  </PieChart>
+                </ResponsiveContainer>
+              )}
             </div>
             <div className="flex-1 space-y-2">
               {feeMix.map((s) => (
@@ -196,12 +243,14 @@ function AdminDashboard() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
-                {[
-                  { id: "TRX-9821", who: "Liam Peterson", cat: "Tuition Fee", d: "Oct 23", amt: "$3,400.00", s: "Paid" },
-                  { id: "TRX-9784", who: "Maya Rodriguez", cat: "Lab Kit", d: "Oct 22", amt: "$120.00", s: "Pending" },
-                  { id: "TRX-9712", who: "Noah Kim", cat: "Tuition Fee", d: "Oct 21", amt: "$3,400.00", s: "Paid" },
-                  { id: "TRX-9655", who: "Sophia Hayes", cat: "Sports", d: "Oct 20", amt: "$220.00", s: "Overdue" },
-                ].map((t) => (
+                {feesQueries.some((q) => q.isLoading) && (
+                  <tr>
+                    <td className="px-6 py-4" colSpan={7}>
+                      <Skeleton className="h-6 w-full" />
+                    </td>
+                  </tr>
+                )}
+                {recentFees.map((t) => (
                   <tr key={t.id} className="transition hover:bg-surface-50">
                     <td className="px-6 py-4 font-mono text-xs">#{t.id}</td>
                     <td className="px-6 py-4">
@@ -223,11 +272,18 @@ function AdminDashboard() {
                     </td>
                   </tr>
                 ))}
+                {!feesQueries.some((q) => q.isLoading) && recentFees.length === 0 && (
+                  <tr>
+                    <td className="px-6 py-6 text-center text-sm text-muted-foreground" colSpan={7}>
+                      No fee records found.
+                    </td>
+                  </tr>
+                )}
               </tbody>
             </table>
           </div>
         </Card>
       </div>
-    </>
+    </RequireRole>
   );
 }

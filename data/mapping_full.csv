@@ -1,0 +1,121 @@
+class_id,subject,teacher_id
+C1A,Mathematics,T028
+C1A,Science,T006
+C1A,English,T001
+C1A,Social Studies,T010
+C1A,Computer Science,T030
+C1B,Mathematics,T003
+C1B,Science,T004
+C1B,English,T012
+C1B,Social Studies,T032
+C1B,Computer Science,T001
+C2A,Mathematics,T023
+C2A,Science,T035
+C2A,English,T026
+C2A,Social Studies,T031
+C2A,Computer Science,T028
+C2B,Mathematics,T022
+C2B,Science,T036
+C2B,English,T004
+C2B,Social Studies,T019
+C2B,Computer Science,T012
+C3A,Mathematics,T001
+C3A,Science,T026
+C3A,English,T030
+C3A,Social Studies,T002
+C3A,Computer Science,T029
+C3B,Mathematics,T001
+C3B,Science,T007
+C3B,English,T003
+C3B,Social Studies,T010
+C3B,Computer Science,T025
+C4A,Mathematics,T024
+C4A,Science,T030
+C4A,English,T001
+C4A,Social Studies,T026
+C4A,Computer Science,T004
+C4B,Mathematics,T013
+C4B,Science,T017
+C4B,English,T020
+C4B,Social Studies,T011
+C4B,Computer Science,T036
+C5A,Mathematics,T035
+C5A,Science,T015
+C5A,English,T020
+C5A,Social Studies,T007
+C5A,Computer Science,T015
+C5B,Mathematics,T015
+C5B,Science,T028
+C5B,English,T024
+C5B,Social Studies,T009
+C5B,Computer Science,T007
+C6A,Mathematics,T011
+C6A,Science,T013
+C6A,English,T003
+C6A,Social Studies,T028
+C6A,Computer Science,T027
+C6B,Mathematics,T033
+C6B,Science,T031
+C6B,English,T035
+C6B,Social Studies,T007
+C6B,Computer Science,T035
+C7A,Mathematics,T018
+C7A,Science,T002
+C7A,English,T007
+C7A,Social Studies,T010
+C7A,Computer Science,T024
+C7B,Mathematics,T019
+C7B,Science,T019
+C7B,English,T030
+C7B,Social Studies,T011
+C7B,Computer Science,T008
+C8A,Mathematics,T031
+C8A,Science,T004
+C8A,English,T017
+C8A,Social Studies,T023
+C8A,Computer Science,T020
+C8B,Mathematics,T029
+C8B,Science,T024
+C8B,English,T015
+C8B,Social Studies,T012
+C8B,Computer Science,T024
+C9A,Mathematics,T002
+C9A,Science,T028
+C9A,English,T003
+C9A,Social Studies,T023
+C9A,Computer Science,T006
+C9B,Mathematics,T007
+C9B,Science,T033
+C9B,English,T012
+C9B,Social Studies,T017
+C9B,Computer Science,T020
+C10A,Mathematics,T011
+C10A,Science,T021
+C10A,English,T011
+C10A,Social Studies,T001
+C10A,Computer Science,T032
+C10B,Mathematics,T001
+C10B,Science,T031
+C10B,English,T023
+C10B,Social Studies,T027
+C10B,Computer Science,T035
+C11A,Mathematics,T028
+C11A,Science,T028
+C11A,English,T001
+C11A,Social Studies,T005
+C11A,Computer Science,T030
+C11B,Mathematics,T014
+C11B,Science,T001
+C11B,English,T025
+C11B,Social Studies,T013
+C11B,Computer Science,T032
+C12A,Mathematics,T015
+C12A,Science,T031
+C12A,English,T010
+C12A,Social Studies,T014
+C12A,Computer Science,T006
+C12B,Mathematics,T023
+C12B,Science,T005
+C12B,English,T016
+C12B,Social Studies,T034
+C12B,Computer Science,T005
