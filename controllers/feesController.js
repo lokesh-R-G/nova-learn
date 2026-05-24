@@ -1,52 +1,36 @@
-import { Fees } from "../models/Fees.js";
-import { Payment } from "../models/Payment.js";
-
-function logCount(label, count) {
-  console.log(`[api] ${label}: ${count} record(s)`);
-}
+import { AppError } from "../utils/appError.js";
+import { created, ok } from "../utils/apiResponse.js";
+import { positiveNumber, requireFields } from "../utils/validators.js";
+import { createPayment as createPaymentService, getFeesByStudent as getFeesByStudentService, listPayments } from "../services/paymentService.js";
 
 export async function getFeesByStudent(req, res) {
-  const record = await Fees.findOne({ student_id: req.params.studentId }, { _id: 0 }).lean();
+  const record = await getFeesByStudentService(req.params.studentId);
   if (!record) {
-    return res.status(404).json({ error: "Fees record not found." });
+    throw new AppError("Fees record not found.", 404);
   }
-  logCount(`fees/student/${req.params.studentId}`, 1);
-  return res.status(200).json({ data: record });
+  return ok(res, record);
 }
 
 export async function getPayments(req, res) {
-  const payments = await Payment.find({}, { _id: 0 }).sort({ date: -1 }).lean();
-  logCount("payments", payments.length);
-  return res.status(200).json({ data: payments });
+  const payments = await listPayments();
+  return ok(res, payments);
 }
 
 export async function createPayment(req, res) {
-  const { student_id, amount, method, date } = req.body;
-  if (!student_id || amount == null || !method || !date) {
-    return res.status(400).json({ error: "student_id, amount, method, and date are required." });
+  const { student_id, amount, method, date, transaction_id } = req.body;
+  requireFields(req.body, ["student_id", "amount", "method", "date"], "payment");
+
+  if (String(method).toUpperCase() === "UPI" && !transaction_id) {
+    throw new AppError("transaction_id is required for UPI payments.", 400);
   }
 
-  const paidAmount = Number(amount);
-  if (Number.isNaN(paidAmount) || paidAmount <= 0) {
-    return res.status(400).json({ error: "amount must be a positive number." });
-  }
-
-  const payment = await Payment.create({
+  const payment = await createPaymentService({
     student_id,
-    amount: paidAmount,
+    amount: positiveNumber(amount, "amount"),
     method,
-    date: new Date(date),
+    date,
+    transaction_id,
   });
 
-  const fees = await Fees.findOne({ student_id });
-  if (fees) {
-    const newPaid = fees.paid + paidAmount;
-    fees.paid = newPaid;
-    fees.balance = Math.max(0, fees.total_fee - newPaid);
-    await fees.save();
-  }
-
-  console.log("[api] payments/create: 1 record");
-
-  return res.status(201).json({ data: { ...payment.toObject(), _id: undefined } });
+  return created(res, { ...payment, _id: undefined });
 }

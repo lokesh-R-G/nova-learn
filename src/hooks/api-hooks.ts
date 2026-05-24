@@ -6,9 +6,25 @@ export type Teacher = { teacher_id: string; name: string; subject: string };
 export type Attendance = { student_id: string; class_id: string; date: string; status: string };
 export type Marks = { student_id: string; subject: string; exam: string; marks: number; max_marks: number };
 export type Assignment = { assignment_id: string; class_id: string; subject: string; title: string };
+export type AssignmentInput = { class_id: string; subject: string; title: string };
+export type StudentAssignment = Assignment & {
+  due_date: string;
+  status: "pending" | "submitted";
+  submission_marks: number | null;
+};
 export type Fees = { student_id: string; total_fee: number; paid: number; balance: number };
-export type Payment = { student_id: string; amount: number; method: string; date: string };
-export type PaymentRecord = { student_id: string; amount: number; method: string; date: string };
+export type Payment = { student_id: string; amount: number; method: string; date: string; transaction_id?: string };
+export type PaymentRecord = { student_id: string; amount: number; method: string; date: string; transaction_id?: string };
+export type AttendanceSummary = {
+  student_id: string;
+  overall: { attended_sessions: number; total_sessions: number; attendance_percent: number };
+  subjects: {
+    subject: string;
+    attended_sessions: number;
+    total_sessions: number;
+    attendance_percent: number;
+  }[];
+};
 export type TimetableEntry = {
   timetable_id: string;
   day: string;
@@ -111,6 +127,15 @@ export function useCreateAttendance() {
   });
 }
 
+export function useAttendanceSummary(studentId: string | undefined) {
+  return useQuery({
+    queryKey: ["attendance", "summary", studentId],
+    queryFn: () => apiGet<ApiItem<AttendanceSummary>>(`/attendance/student/${studentId}/summary`),
+    select: (data) => data.data,
+    enabled: !!studentId,
+  });
+}
+
 export function useMarks(studentId: string | undefined) {
   return useQuery({
     queryKey: ["marks", studentId],
@@ -142,10 +167,19 @@ export function useAssignments(classId: string | undefined) {
 export function useCreateAssignment() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (payload: Assignment) => apiPost<ApiItem<Assignment>>("/assignments", payload),
+    mutationFn: (payload: AssignmentInput) => apiPost<ApiItem<Assignment>>("/assignments", payload),
     onSuccess: (_data, variables) => {
       queryClient.invalidateQueries({ queryKey: ["assignments", variables.class_id] });
     },
+  });
+}
+
+export function useStudentAssignments(studentId: string | undefined) {
+  return useQuery({
+    queryKey: ["assignments", "student", studentId],
+    queryFn: () => apiGet<ApiList<StudentAssignment>>(`/assignments/student/${studentId}`),
+    select: (data) => data.data,
+    enabled: !!studentId,
   });
 }
 
@@ -181,6 +215,16 @@ export function useTimetable() {
     queryKey: ["timetable"],
     queryFn: () => apiGet<ApiList<TimetableEntry>>("/timetable"),
     select: (data) => data.data,
+  });
+}
+
+export function useCreateTimetable() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (payload: TimetableEntry) => apiPost<ApiItem<TimetableEntry>>("/timetable", payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["timetable"] });
+    },
   });
 }
 

@@ -1,39 +1,29 @@
-import { Attendance } from "../models/Attendance.js";
-
-function logCount(label, count) {
-  console.log(`[api] ${label}: ${count} record(s)`);
-}
+import { created, ok } from "../utils/apiResponse.js";
+import { requireFields } from "../utils/validators.js";
+import {
+  createOrUpdateAttendance,
+  getAttendanceByClass as getAttendanceByClassService,
+  getAttendanceByStudent as getAttendanceByStudentService,
+  getStudentAttendanceSummary,
+} from "../services/attendanceService.js";
 
 export async function getAttendanceByStudent(req, res) {
-  const records = await Attendance.find({ student_id: req.params.studentId }, { _id: 0 })
-    .sort({ date: -1 })
-    .lean();
-  logCount(`attendance/student/${req.params.studentId}`, records.length);
-  res.status(200).json({ data: records });
+  const records = await getAttendanceByStudentService(req.params.studentId);
+  return ok(res, records);
 }
 
 export async function getAttendanceByClass(req, res) {
-  const records = await Attendance.find({ class_id: req.params.classId }, { _id: 0 })
-    .sort({ date: -1, student_id: 1 })
-    .lean();
-  logCount(`attendance/class/${req.params.classId}`, records.length);
-  res.status(200).json({ data: records });
+  const records = await getAttendanceByClassService(req.params.classId);
+  return ok(res, records);
+}
+
+export async function getAttendanceSummaryByStudent(req, res) {
+  const summary = await getStudentAttendanceSummary(req.params.studentId);
+  return ok(res, summary);
 }
 
 export async function createAttendance(req, res) {
-  const { student_id, class_id, date, status } = req.body;
-  if (!student_id || !class_id || !date || !status) {
-    return res.status(400).json({ error: "student_id, class_id, date, and status are required." });
-  }
-
-  const record = await Attendance.create({
-    student_id,
-    class_id,
-    date: new Date(date),
-    status,
-  });
-
-  console.log(`[api] attendance/create: 1 record`);
-
-  return res.status(201).json({ data: { ...record.toObject(), _id: undefined } });
+  requireFields(req.body, ["student_id", "class_id", "date", "status"], "attendance");
+  const record = await createOrUpdateAttendance(req.body);
+  return created(res, { ...record, _id: undefined });
 }

@@ -2,6 +2,9 @@ import { Student } from "../models/Student.js";
 import { retrieveContext } from "../services/retrievalService.js";
 import { askOpenRouter } from "../services/aiService.js";
 import { getServerEnv } from "../services/env.js";
+import { AppError } from "../utils/appError.js";
+import { ok } from "../utils/apiResponse.js";
+import { requireFields } from "../utils/validators.js";
 
 let _config;
 function getConfig() {
@@ -12,13 +15,11 @@ function getConfig() {
 export async function chat(req, res) {
   const config = getConfig();
   const { student_id, subject, question } = req.body;
-  if (!student_id || !subject || !question) {
-    return res.status(400).json({ error: "student_id, subject, and question are required." });
-  }
+  requireFields(req.body, ["student_id", "subject", "question"], "ai chat");
 
   const student = await Student.findOne({ student_id }, { _id: 0 }).lean();
   if (!student) {
-    return res.status(404).json({ error: "Student not found." });
+    throw new AppError("Student not found.", 404);
   }
 
   const { contextText, sources } = retrieveContext({ subject, question, limit: 3 });
@@ -28,7 +29,7 @@ export async function chat(req, res) {
     config,
   });
 
-  return res.status(200).json({
+  return ok(res, {
     answer,
     sources,
   });

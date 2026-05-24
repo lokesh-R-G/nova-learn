@@ -1,21 +1,33 @@
-import { Student } from "../models/Student.js";
+import { AppError } from "../utils/appError.js";
+import { ok } from "../utils/apiResponse.js";
+import { parsePagination } from "../utils/validators.js";
+import { getStudentById as getStudentByIdService, getStudentsByClass as getStudentsByClassService, listStudents } from "../services/studentService.js";
 
 export async function getStudents(req, res) {
-  const limit = Math.min(Number.parseInt(req.query.limit ?? "100", 10), 500);
-  const skip = Number.parseInt(req.query.skip ?? "0", 10);
-  const students = await Student.find({}, { _id: 0 }).skip(skip).limit(limit).lean();
-  res.status(200).json({ data: students });
+  const { page, limit, skip } = parsePagination(req.query, { page: 1, limit: 20, maxLimit: 200 });
+  const classId = req.query.class_id ? String(req.query.class_id) : undefined;
+  const q = req.query.q ? String(req.query.q) : undefined;
+  const { rows, total } = await listStudents({ skip, limit, classId, q });
+  return ok(res, rows, {
+    pagination: {
+      page,
+      limit,
+      total,
+      totalPages: Math.max(1, Math.ceil(total / limit)),
+    },
+    filters: { class_id: classId ?? null, q: q ?? null },
+  });
 }
 
 export async function getStudentById(req, res) {
-  const student = await Student.findOne({ student_id: req.params.id }, { _id: 0 }).lean();
+  const student = await getStudentByIdService(req.params.id);
   if (!student) {
-    return res.status(404).json({ error: "Student not found." });
+    throw new AppError("Student not found.", 404);
   }
-  return res.status(200).json({ data: student });
+  return ok(res, student);
 }
 
 export async function getStudentsByClass(req, res) {
-  const students = await Student.find({ class_id: req.params.classId }, { _id: 0 }).lean();
-  res.status(200).json({ data: students });
+  const students = await getStudentsByClassService(req.params.classId);
+  return ok(res, students);
 }

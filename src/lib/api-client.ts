@@ -41,7 +41,9 @@ export async function apiRequest<T>(path: string, options: RequestOptions = {}):
     if (response.status === 401) {
       clearAuth();
     }
-    const message = isJson && payload?.error ? payload.error : `Request failed (${response.status}).`;
+    const message = isJson
+      ? payload?.error?.message || payload?.error || `Request failed (${response.status}).`
+      : `Request failed (${response.status}).`;
     throw new ApiError(message, response.status, payload);
   }
 
@@ -54,4 +56,8 @@ export function apiGet<T>(path: string) {
 
 export function apiPost<T>(path: string, body: unknown) {
   return apiRequest<T>(path, { method: "POST", body });
+}
+
+export function apiPut<T>(path: string, body: unknown) {
+  return apiRequest<T>(path, { method: "PUT", body });
 }

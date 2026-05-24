@@ -4,7 +4,8 @@ import { CheckCircle2, XCircle } from "lucide-react";
 import { Card, PageHeader, SectionTitle, Badge } from "@/components/app/ui-bits";
 import { Skeleton } from "@/components/ui/skeleton";
 import { resolveStudentId } from "@/lib/defaults";
-import { useAttendance } from "@/hooks/api-hooks";
+import { useAttendance, useAttendanceSummary } from "@/hooks/api-hooks";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Tooltip } from "recharts";
 
 export const Route = createFileRoute("/student/attendance")({
   head: () => ({ meta: [{ title: "Attendance — AetherLMS" }] }),
@@ -13,7 +14,8 @@ export const Route = createFileRoute("/student/attendance")({
 
 function StudentAttendancePage() {
   const studentId = resolveStudentId(null);
-  const { data: attendance, isLoading } = useAttendance(studentId);
+  const { data: attendance, isLoading, isError } = useAttendance(studentId);
+  const { data: summary, isLoading: summaryLoading } = useAttendanceSummary(studentId);
 
   const stats = useMemo(() => {
     const total = attendance?.length ?? 0;
@@ -33,6 +35,32 @@ function StudentAttendancePage() {
       </div>
 
       <Card>
+        <SectionTitle action={<Badge tone="brand">Subject-wise</Badge>}>Attendance by Subject</SectionTitle>
+        <div className="h-72">
+          {summaryLoading ? (
+            <Skeleton className="h-full w-full" />
+          ) : (
+            <ResponsiveContainer>
+              <BarChart data={summary?.subjects ?? []} margin={{ left: -20, right: 10 }}>
+                <CartesianGrid stroke="var(--border)" strokeDasharray="3 3" vertical={false} />
+                <XAxis dataKey="subject" stroke="var(--muted-foreground)" tickLine={false} axisLine={false} fontSize={12} />
+                <YAxis stroke="var(--muted-foreground)" tickLine={false} axisLine={false} fontSize={12} />
+                <Tooltip
+                  formatter={(value, key, row) => {
+                    const payload = row?.payload;
+                    if (!payload) return value;
+                    return [`${payload.attended_sessions}/${payload.total_sessions}`, "Sessions"];
+                  }}
+                  contentStyle={{ background: "var(--popover)", border: "1px solid var(--border)", borderRadius: 12 }}
+                />
+                <Bar dataKey="attendance_percent" fill="var(--brand-500)" radius={[8, 8, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          )}
+        </div>
+      </Card>
+
+      <Card>
         <SectionTitle action={<Badge tone="brand">Live data</Badge>}>Recent Sessions</SectionTitle>
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm">
@@ -42,6 +70,12 @@ function StudentAttendancePage() {
             <tbody className="divide-y divide-border">
               {isLoading && (
                 <tr><td className="px-4 py-4" colSpan={3}><Skeleton className="h-6 w-full" /></td></tr>
+              )}
+              {isError && (
+                <tr><td className="px-4 py-4 text-danger" colSpan={3}>Failed to load attendance.</td></tr>
+              )}
+              {!isLoading && !isError && (attendance ?? []).length === 0 && (
+                <tr><td className="px-4 py-4 text-muted-foreground" colSpan={3}>No attendance records found.</td></tr>
               )}
               {(attendance ?? []).map((record) => (
                 <tr key={`${record.student_id}-${record.date}`}>

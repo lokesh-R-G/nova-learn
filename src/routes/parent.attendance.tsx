@@ -3,6 +3,7 @@ import { useMemo } from "react";
 import { Card, PageHeader, SectionTitle, Badge } from "@/components/app/ui-bits";
 import { resolveParentStudentId } from "@/lib/defaults";
 import { useAttendance } from "@/hooks/api-hooks";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export const Route = createFileRoute("/parent/attendance")({
   head: () => ({ meta: [{ title: "Parent Attendance — AetherLMS" }] }),
@@ -11,7 +12,7 @@ export const Route = createFileRoute("/parent/attendance")({
 
 function ParentAttendancePage() {
   const studentId = resolveParentStudentId(null);
-  const { data: attendance } = useAttendance(studentId);
+  const { data: attendance, isLoading, isError } = useAttendance(studentId);
 
   const stats = useMemo(() => {
     const total = attendance?.length ?? 0;
@@ -31,12 +32,15 @@ function ParentAttendancePage() {
       <Card>
         <SectionTitle action={<Badge tone="brand">Latest records</Badge>}>Session Log</SectionTitle>
         <div className="space-y-2">
+          {isLoading && <Skeleton className="h-12 w-full" />}
+          {isError && <p className="text-sm text-danger">Failed to load attendance.</p>}
           {(attendance ?? []).slice(0, 6).map((record) => (
             <div key={`${record.student_id}-${record.date}`} className="flex items-center justify-between rounded-xl border border-border p-3 text-sm">
               <span>{new Date(record.date).toLocaleDateString()}</span>
               <Badge tone={record.status === "present" ? "success" : "danger"}>{record.status}</Badge>
             </div>
           ))}
+          {!isLoading && !isError && (attendance ?? []).length === 0 && <p className="text-sm text-muted-foreground">No attendance found.</p>}
         </div>
       </Card>
     </div>

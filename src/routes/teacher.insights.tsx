@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Card, PageHeader, SectionTitle, Badge } from "@/components/app/ui-bits";
 import { resolveTeacherClassId } from "@/lib/defaults";
 import { useClassAnalytics } from "@/hooks/api-hooks";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export const Route = createFileRoute("/teacher/insights")({
   head: () => ({ meta: [{ title: "Class Insights — AetherLMS" }] }),
@@ -10,7 +11,7 @@ export const Route = createFileRoute("/teacher/insights")({
 
 function TeacherInsightsPage() {
   const classId = resolveTeacherClassId();
-  const { data: analytics } = useClassAnalytics(classId);
+  const { data: analytics, isLoading, isError } = useClassAnalytics(classId);
 
   return (
     <div className="space-y-6">
@@ -24,6 +25,8 @@ function TeacherInsightsPage() {
       <Card>
         <SectionTitle action={<Badge tone="brand">Subjects</Badge>}>Subject Performance</SectionTitle>
         <div className="space-y-3">
+          {isLoading && <Skeleton className="h-14 w-full" />}
+          {isError && <p className="text-sm text-danger">Failed to load class analytics.</p>}
           {(analytics?.subject_scores ?? []).map((item) => (
             <div key={item.subject} className="flex items-center justify-between rounded-xl border border-border p-4">
               <div>
@@ -33,6 +36,7 @@ function TeacherInsightsPage() {
               <span className="text-lg font-bold">{item.averageScore}%</span>
             </div>
           ))}
+          {!isLoading && !isError && (analytics?.subject_scores ?? []).length === 0 && <p className="text-sm text-muted-foreground">No subject insights available.</p>}
         </div>
       </Card>
     </div>
