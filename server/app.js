@@ -8,6 +8,9 @@ import marksRoutes from "../routes/marksRoutes.js";
 import assignmentRoutes from "../routes/assignmentRoutes.js";
 import feesRoutes from "../routes/feesRoutes.js";
 import paymentRoutes from "../routes/paymentRoutes.js";
+import timetableRoutes from "../routes/timetableRoutes.js";
+import notificationRoutes from "../routes/notificationRoutes.js";
+import analyticsRoutes from "../routes/analyticsRoutes.js";
 import aiRoutes from "../routes/aiRoutes.js";
 import { requestLogger } from "../middlewares/requestLogger.js";
 import { errorHandler } from "../middlewares/errorHandler.js";
@@ -30,6 +33,9 @@ export function createApp() {
   app.use("/api/assignments", assignmentRoutes);
   app.use("/api/fees", feesRoutes);
   app.use("/api/payments", paymentRoutes);
+  app.use("/api/timetable", timetableRoutes);
+  app.use("/api/notifications", notificationRoutes);
+  app.use("/api/analytics", analyticsRoutes);
   app.use("/api/ai", aiRoutes);
 
   app.use(errorHandler);

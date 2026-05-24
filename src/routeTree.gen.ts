@@ -16,6 +16,18 @@ import { Route as AssistantRouteImport } from './routes/assistant'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AccountsRouteImport } from './routes/accounts'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as TeacherInsightsRouteImport } from './routes/teacher.insights'
+import { Route as TeacherAttendanceRouteImport } from './routes/teacher.attendance'
+import { Route as TeacherAssignmentsRouteImport } from './routes/teacher.assignments'
+import { Route as StudentSubjectsRouteImport } from './routes/student.subjects'
+import { Route as StudentAttendanceRouteImport } from './routes/student.attendance'
+import { Route as StudentAssignmentsRouteImport } from './routes/student.assignments'
+import { Route as ParentNotificationsRouteImport } from './routes/parent.notifications'
+import { Route as ParentAttendanceRouteImport } from './routes/parent.attendance'
+import { Route as AdminTimetableRouteImport } from './routes/admin.timetable'
+import { Route as AdminStudentsRouteImport } from './routes/admin.students'
+import { Route as AdminStaffRouteImport } from './routes/admin.staff'
+import { Route as AccountsTransactionsRouteImport } from './routes/accounts.transactions'
 
 const TeacherRoute = TeacherRouteImport.update({
   id: '/teacher',
@@ -52,34 +64,130 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TeacherInsightsRoute = TeacherInsightsRouteImport.update({
+  id: '/insights',
+  path: '/insights',
+  getParentRoute: () => TeacherRoute,
+} as any)
+const TeacherAttendanceRoute = TeacherAttendanceRouteImport.update({
+  id: '/attendance',
+  path: '/attendance',
+  getParentRoute: () => TeacherRoute,
+} as any)
+const TeacherAssignmentsRoute = TeacherAssignmentsRouteImport.update({
+  id: '/assignments',
+  path: '/assignments',
+  getParentRoute: () => TeacherRoute,
+} as any)
+const StudentSubjectsRoute = StudentSubjectsRouteImport.update({
+  id: '/subjects',
+  path: '/subjects',
+  getParentRoute: () => StudentRoute,
+} as any)
+const StudentAttendanceRoute = StudentAttendanceRouteImport.update({
+  id: '/attendance',
+  path: '/attendance',
+  getParentRoute: () => StudentRoute,
+} as any)
+const StudentAssignmentsRoute = StudentAssignmentsRouteImport.update({
+  id: '/assignments',
+  path: '/assignments',
+  getParentRoute: () => StudentRoute,
+} as any)
+const ParentNotificationsRoute = ParentNotificationsRouteImport.update({
+  id: '/notifications',
+  path: '/notifications',
+  getParentRoute: () => ParentRoute,
+} as any)
+const ParentAttendanceRoute = ParentAttendanceRouteImport.update({
+  id: '/attendance',
+  path: '/attendance',
+  getParentRoute: () => ParentRoute,
+} as any)
+const AdminTimetableRoute = AdminTimetableRouteImport.update({
+  id: '/timetable',
+  path: '/timetable',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminStudentsRoute = AdminStudentsRouteImport.update({
+  id: '/students',
+  path: '/students',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminStaffRoute = AdminStaffRouteImport.update({
+  id: '/staff',
+  path: '/staff',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AccountsTransactionsRoute = AccountsTransactionsRouteImport.update({
+  id: '/transactions',
+  path: '/transactions',
+  getParentRoute: () => AccountsRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/accounts': typeof AccountsRoute
-  '/admin': typeof AdminRoute
+  '/accounts': typeof AccountsRouteWithChildren
+  '/admin': typeof AdminRouteWithChildren
   '/assistant': typeof AssistantRoute
-  '/parent': typeof ParentRoute
-  '/student': typeof StudentRoute
-  '/teacher': typeof TeacherRoute
+  '/parent': typeof ParentRouteWithChildren
+  '/student': typeof StudentRouteWithChildren
+  '/teacher': typeof TeacherRouteWithChildren
+  '/accounts/transactions': typeof AccountsTransactionsRoute
+  '/admin/staff': typeof AdminStaffRoute
+  '/admin/students': typeof AdminStudentsRoute
+  '/admin/timetable': typeof AdminTimetableRoute
+  '/parent/attendance': typeof ParentAttendanceRoute
+  '/parent/notifications': typeof ParentNotificationsRoute
+  '/student/assignments': typeof StudentAssignmentsRoute
+  '/student/attendance': typeof StudentAttendanceRoute
+  '/student/subjects': typeof StudentSubjectsRoute
+  '/teacher/assignments': typeof TeacherAssignmentsRoute
+  '/teacher/attendance': typeof TeacherAttendanceRoute
+  '/teacher/insights': typeof TeacherInsightsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/accounts': typeof AccountsRoute
-  '/admin': typeof AdminRoute
+  '/accounts': typeof AccountsRouteWithChildren
+  '/admin': typeof AdminRouteWithChildren
   '/assistant': typeof AssistantRoute
-  '/parent': typeof ParentRoute
-  '/student': typeof StudentRoute
-  '/teacher': typeof TeacherRoute
+  '/parent': typeof ParentRouteWithChildren
+  '/student': typeof StudentRouteWithChildren
+  '/teacher': typeof TeacherRouteWithChildren
+  '/accounts/transactions': typeof AccountsTransactionsRoute
+  '/admin/staff': typeof AdminStaffRoute
+  '/admin/students': typeof AdminStudentsRoute
+  '/admin/timetable': typeof AdminTimetableRoute
+  '/parent/attendance': typeof ParentAttendanceRoute
+  '/parent/notifications': typeof ParentNotificationsRoute
+  '/student/assignments': typeof StudentAssignmentsRoute
+  '/student/attendance': typeof StudentAttendanceRoute
+  '/student/subjects': typeof StudentSubjectsRoute
+  '/teacher/assignments': typeof TeacherAssignmentsRoute
+  '/teacher/attendance': typeof TeacherAttendanceRoute
+  '/teacher/insights': typeof TeacherInsightsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/accounts': typeof AccountsRoute
-  '/admin': typeof AdminRoute
+  '/accounts': typeof AccountsRouteWithChildren
+  '/admin': typeof AdminRouteWithChildren
   '/assistant': typeof AssistantRoute
-  '/parent': typeof ParentRoute
-  '/student': typeof StudentRoute
-  '/teacher': typeof TeacherRoute
+  '/parent': typeof ParentRouteWithChildren
+  '/student': typeof StudentRouteWithChildren
+  '/teacher': typeof TeacherRouteWithChildren
+  '/accounts/transactions': typeof AccountsTransactionsRoute
+  '/admin/staff': typeof AdminStaffRoute
+  '/admin/students': typeof AdminStudentsRoute
+  '/admin/timetable': typeof AdminTimetableRoute
+  '/parent/attendance': typeof ParentAttendanceRoute
+  '/parent/notifications': typeof ParentNotificationsRoute
+  '/student/assignments': typeof StudentAssignmentsRoute
+  '/student/attendance': typeof StudentAttendanceRoute
+  '/student/subjects': typeof StudentSubjectsRoute
+  '/teacher/assignments': typeof TeacherAssignmentsRoute
+  '/teacher/attendance': typeof TeacherAttendanceRoute
+  '/teacher/insights': typeof TeacherInsightsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -91,6 +199,18 @@ export interface FileRouteTypes {
     | '/parent'
     | '/student'
     | '/teacher'
+    | '/accounts/transactions'
+    | '/admin/staff'
+    | '/admin/students'
+    | '/admin/timetable'
+    | '/parent/attendance'
+    | '/parent/notifications'
+    | '/student/assignments'
+    | '/student/attendance'
+    | '/student/subjects'
+    | '/teacher/assignments'
+    | '/teacher/attendance'
+    | '/teacher/insights'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -100,6 +220,18 @@ export interface FileRouteTypes {
     | '/parent'
     | '/student'
     | '/teacher'
+    | '/accounts/transactions'
+    | '/admin/staff'
+    | '/admin/students'
+    | '/admin/timetable'
+    | '/parent/attendance'
+    | '/parent/notifications'
+    | '/student/assignments'
+    | '/student/attendance'
+    | '/student/subjects'
+    | '/teacher/assignments'
+    | '/teacher/attendance'
+    | '/teacher/insights'
   id:
     | '__root__'
     | '/'
@@ -109,16 +241,28 @@ export interface FileRouteTypes {
     | '/parent'
     | '/student'
     | '/teacher'
+    | '/accounts/transactions'
+    | '/admin/staff'
+    | '/admin/students'
+    | '/admin/timetable'
+    | '/parent/attendance'
+    | '/parent/notifications'
+    | '/student/assignments'
+    | '/student/attendance'
+    | '/student/subjects'
+    | '/teacher/assignments'
+    | '/teacher/attendance'
+    | '/teacher/insights'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  AccountsRoute: typeof AccountsRoute
-  AdminRoute: typeof AdminRoute
+  AccountsRoute: typeof AccountsRouteWithChildren
+  AdminRoute: typeof AdminRouteWithChildren
   AssistantRoute: typeof AssistantRoute
-  ParentRoute: typeof ParentRoute
-  StudentRoute: typeof StudentRoute
-  TeacherRoute: typeof TeacherRoute
+  ParentRoute: typeof ParentRouteWithChildren
+  StudentRoute: typeof StudentRouteWithChildren
+  TeacherRoute: typeof TeacherRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
@@ -172,17 +316,170 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/teacher/insights': {
+      id: '/teacher/insights'
+      path: '/insights'
+      fullPath: '/teacher/insights'
+      preLoaderRoute: typeof TeacherInsightsRouteImport
+      parentRoute: typeof TeacherRoute
+    }
+    '/teacher/attendance': {
+      id: '/teacher/attendance'
+      path: '/attendance'
+      fullPath: '/teacher/attendance'
+      preLoaderRoute: typeof TeacherAttendanceRouteImport
+      parentRoute: typeof TeacherRoute
+    }
+    '/teacher/assignments': {
+      id: '/teacher/assignments'
+      path: '/assignments'
+      fullPath: '/teacher/assignments'
+      preLoaderRoute: typeof TeacherAssignmentsRouteImport
+      parentRoute: typeof TeacherRoute
+    }
+    '/student/subjects': {
+      id: '/student/subjects'
+      path: '/subjects'
+      fullPath: '/student/subjects'
+      preLoaderRoute: typeof StudentSubjectsRouteImport
+      parentRoute: typeof StudentRoute
+    }
+    '/student/attendance': {
+      id: '/student/attendance'
+      path: '/attendance'
+      fullPath: '/student/attendance'
+      preLoaderRoute: typeof StudentAttendanceRouteImport
+      parentRoute: typeof StudentRoute
+    }
+    '/student/assignments': {
+      id: '/student/assignments'
+      path: '/assignments'
+      fullPath: '/student/assignments'
+      preLoaderRoute: typeof StudentAssignmentsRouteImport
+      parentRoute: typeof StudentRoute
+    }
+    '/parent/notifications': {
+      id: '/parent/notifications'
+      path: '/notifications'
+      fullPath: '/parent/notifications'
+      preLoaderRoute: typeof ParentNotificationsRouteImport
+      parentRoute: typeof ParentRoute
+    }
+    '/parent/attendance': {
+      id: '/parent/attendance'
+      path: '/attendance'
+      fullPath: '/parent/attendance'
+      preLoaderRoute: typeof ParentAttendanceRouteImport
+      parentRoute: typeof ParentRoute
+    }
+    '/admin/timetable': {
+      id: '/admin/timetable'
+      path: '/timetable'
+      fullPath: '/admin/timetable'
+      preLoaderRoute: typeof AdminTimetableRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/students': {
+      id: '/admin/students'
+      path: '/students'
+      fullPath: '/admin/students'
+      preLoaderRoute: typeof AdminStudentsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/staff': {
+      id: '/admin/staff'
+      path: '/staff'
+      fullPath: '/admin/staff'
+      preLoaderRoute: typeof AdminStaffRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/accounts/transactions': {
+      id: '/accounts/transactions'
+      path: '/transactions'
+      fullPath: '/accounts/transactions'
+      preLoaderRoute: typeof AccountsTransactionsRouteImport
+      parentRoute: typeof AccountsRoute
+    }
   }
 }
 
+interface AccountsRouteChildren {
+  AccountsTransactionsRoute: typeof AccountsTransactionsRoute
+}
+
+const AccountsRouteChildren: AccountsRouteChildren = {
+  AccountsTransactionsRoute: AccountsTransactionsRoute,
+}
+
+const AccountsRouteWithChildren = AccountsRoute._addFileChildren(
+  AccountsRouteChildren,
+)
+
+interface AdminRouteChildren {
+  AdminStaffRoute: typeof AdminStaffRoute
+  AdminStudentsRoute: typeof AdminStudentsRoute
+  AdminTimetableRoute: typeof AdminTimetableRoute
+}
+
+const AdminRouteChildren: AdminRouteChildren = {
+  AdminStaffRoute: AdminStaffRoute,
+  AdminStudentsRoute: AdminStudentsRoute,
+  AdminTimetableRoute: AdminTimetableRoute,
+}
+
+const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
+
+interface ParentRouteChildren {
+  ParentAttendanceRoute: typeof ParentAttendanceRoute
+  ParentNotificationsRoute: typeof ParentNotificationsRoute
+}
+
+const ParentRouteChildren: ParentRouteChildren = {
+  ParentAttendanceRoute: ParentAttendanceRoute,
+  ParentNotificationsRoute: ParentNotificationsRoute,
+}
+
+const ParentRouteWithChildren =
+  ParentRoute._addFileChildren(ParentRouteChildren)
+
+interface StudentRouteChildren {
+  StudentAssignmentsRoute: typeof StudentAssignmentsRoute
+  StudentAttendanceRoute: typeof StudentAttendanceRoute
+  StudentSubjectsRoute: typeof StudentSubjectsRoute
+}
+
+const StudentRouteChildren: StudentRouteChildren = {
+  StudentAssignmentsRoute: StudentAssignmentsRoute,
+  StudentAttendanceRoute: StudentAttendanceRoute,
+  StudentSubjectsRoute: StudentSubjectsRoute,
+}
+
+const StudentRouteWithChildren =
+  StudentRoute._addFileChildren(StudentRouteChildren)
+
+interface TeacherRouteChildren {
+  TeacherAssignmentsRoute: typeof TeacherAssignmentsRoute
+  TeacherAttendanceRoute: typeof TeacherAttendanceRoute
+  TeacherInsightsRoute: typeof TeacherInsightsRoute
+}
+
+const TeacherRouteChildren: TeacherRouteChildren = {
+  TeacherAssignmentsRoute: TeacherAssignmentsRoute,
+  TeacherAttendanceRoute: TeacherAttendanceRoute,
+  TeacherInsightsRoute: TeacherInsightsRoute,
+}
+
+const TeacherRouteWithChildren =
+  TeacherRoute._addFileChildren(TeacherRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  AccountsRoute: AccountsRoute,
-  AdminRoute: AdminRoute,
+  AccountsRoute: AccountsRouteWithChildren,
+  AdminRoute: AdminRouteWithChildren,
   AssistantRoute: AssistantRoute,
-  ParentRoute: ParentRoute,
-  StudentRoute: StudentRoute,
-  TeacherRoute: TeacherRoute,
+  ParentRoute: ParentRouteWithChildren,
+  StudentRoute: StudentRouteWithChildren,
+  TeacherRoute: TeacherRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

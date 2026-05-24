@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Outlet } from "@tanstack/react-router";
 import { motion } from "framer-motion";
 import { useMemo } from "react";
 import {
@@ -284,6 +284,8 @@ function AdminDashboard() {
           </div>
         </Card>
       </div>
+
+      <Outlet />
     </RequireRole>
   );
 }

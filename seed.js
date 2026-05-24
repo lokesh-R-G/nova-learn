@@ -191,55 +191,49 @@ async function run() {
     throw error;
   }
 
-  const tasks = [
-    {
+  const seedSpecs = {
+    classes_full: {
       model: Class,
-      fileName: "classes_full.csv",
       mapRow: (row) => ({
         class_id: trim(row.class_id),
         grade: toNumber(row.grade),
         section: trim(row.section),
       }),
     },
-    {
+    teachers_full: {
       model: Teacher,
-      fileName: "teachers_full.csv",
       mapRow: (row) => ({
         teacher_id: trim(row.teacher_id),
         name: trim(row.name),
         subject: trim(row.subject),
       }),
     },
-    {
+    students_full: {
       model: Student,
-      fileName: "students_full.csv",
       mapRow: (row) => ({
         student_id: trim(row.student_id),
         class_id: trim(row.class_id),
         name: trim(row.name),
       }),
     },
-    {
+    parents_full: {
       model: Parent,
-      fileName: "parents_full.csv",
       mapRow: (row) => ({
         parent_id: trim(row.parent_id),
         student_id: trim(row.student_id),
         name: trim(row.name),
       }),
     },
-    {
+    mapping_full: {
       model: Mapping,
-      fileName: "mapping_full.csv",
       mapRow: (row) => ({
         class_id: trim(row.class_id),
         subject: trim(row.subject),
         teacher_id: trim(row.teacher_id),
       }),
     },
-    {
+    attendance_full: {
       model: Attendance,
-      fileName: "attendance_full.csv",
       mapRow: (row) => ({
         student_id: trim(row.student_id),
         class_id: trim(row.class_id),
@@ -247,9 +241,8 @@ async function run() {
         status: trim(row.status),
       }),
     },
-    {
+    marks_full: {
       model: Marks,
-      fileName: "marks_full.csv",
       mapRow: (row) => ({
         student_id: trim(row.student_id),
         subject: trim(row.subject),
@@ -258,9 +251,8 @@ async function run() {
         max_marks: toNumber(row.max_marks),
       }),
     },
-    {
+    fees_full: {
       model: Fees,
-      fileName: "fees_full.csv",
       mapRow: (row) => ({
         student_id: trim(row.student_id),
         total_fee: toNumber(row.total_fee),
@@ -268,9 +260,8 @@ async function run() {
         balance: toNumber(row.balance),
       }),
     },
-    {
+    payments_full: {
       model: Payment,
-      fileName: "payments_full.csv",
       mapRow: (row) => ({
         student_id: trim(row.student_id),
         amount: toNumber(row.amount),
@@ -278,9 +269,8 @@ async function run() {
         date: toDate(row.date),
       }),
     },
-    {
+    assignments_full: {
       model: Assignment,
-      fileName: "assignments_full.csv",
       mapRow: (row) => ({
         assignment_id: trim(row.assignment_id),
         class_id: trim(row.class_id),
@@ -288,25 +278,51 @@ async function run() {
         title: trim(row.title),
       }),
     },
-    {
+    submissions_full: {
       model: Submission,
-      fileName: "submissions_full.csv",
       mapRow: (row) => ({
         assignment_id: trim(row.assignment_id),
         student_id: trim(row.student_id),
         marks: toNumber(row.marks),
       }),
     },
-  ];
+  };
 
-  for (const task of tasks) {
-    await maybeClear(task.model);
-    console.log(`Seeding ${task.model.collection.name} from ${task.fileName}...`);
-    const result = await seedCsv(task);
-    console.log(
-      `Seeded ${task.model.collection.name}: ${result.inserted} inserted (${result.processed} processed).`,
-    );
+  const csvFiles = fs
+    .readdirSync(DATA_DIR)
+    .filter((file) => file.toLowerCase().endsWith(".csv"))
+    .sort((left, right) => left.localeCompare(right));
+
+  const summary = {
+    discovered: csvFiles.length,
+    seeded: 0,
+    skipped: 0,
+    inserted: 0,
+    processed: 0,
+  };
+
+  for (const fileName of csvFiles) {
+    const fileKey = path.parse(fileName).name;
+    const spec = seedSpecs[fileKey];
+
+    if (!spec) {
+      summary.skipped += 1;
+      console.log(`Skipping ${fileName}: no seed mapping defined.`);
+      continue;
+    }
+
+    await maybeClear(spec.model);
+    console.log(`Seeding ${spec.model.collection.name} from ${fileName}...`);
+    const result = await seedCsv({ model: spec.model, fileName, mapRow: spec.mapRow });
+    summary.seeded += 1;
+    summary.inserted += result.inserted;
+    summary.processed += result.processed;
+    console.log(`Seeded ${spec.model.collection.name}: ${result.inserted} inserted (${result.processed} processed).`);
   }
+
+  console.log(
+    `Seeding complete: ${summary.seeded}/${summary.discovered} files seeded, ${summary.skipped} skipped, ${summary.inserted} inserted from ${summary.processed} rows.`,
+  );
 
   await mongoose.disconnect();
 }

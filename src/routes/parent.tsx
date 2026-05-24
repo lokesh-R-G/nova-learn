@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Outlet } from "@tanstack/react-router";
 import { motion } from "framer-motion";
 import { useMemo } from "react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Tooltip } from "recharts";
@@ -182,6 +182,8 @@ function ParentDashboard() {
           </ul>
         </Card>
       </div>
+
+      <Outlet />
     </RequireRole>
   );
 }

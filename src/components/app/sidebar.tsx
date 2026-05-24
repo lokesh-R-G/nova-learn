@@ -9,7 +9,6 @@ import {
   ClipboardCheck,
   Bell,
   Sparkles,
-  Settings,
   ChevronsLeft,
   type LucideIcon,
 } from "lucide-react";
@@ -173,9 +172,6 @@ export function AppSidebar({
               <p className="truncate text-sm font-semibold">{current.person}</p>
               <p className="truncate text-xs text-muted-foreground">{current.subtitle}</p>
             </div>
-          )}
-          {!collapsed && (
-            <Settings className="size-4 text-muted-foreground hover:text-foreground" />
           )}
         </div>
       </div>

@@ -8,6 +8,40 @@ export type Marks = { student_id: string; subject: string; exam: string; marks: 
 export type Assignment = { assignment_id: string; class_id: string; subject: string; title: string };
 export type Fees = { student_id: string; total_fee: number; paid: number; balance: number };
 export type Payment = { student_id: string; amount: number; method: string; date: string };
+export type PaymentRecord = { student_id: string; amount: number; method: string; date: string };
+export type TimetableEntry = {
+  timetable_id: string;
+  day: string;
+  period: number;
+  start_time: string;
+  end_time: string;
+  class_id: string;
+  grade: number | null;
+  section: string | null;
+  subject: string;
+  teacher_id: string;
+  teacher_name: string;
+  room: string;
+  status: string;
+};
+export type NotificationItem = {
+  notification_id: string;
+  type: string;
+  title: string;
+  message: string;
+  severity: "danger" | "warning" | "success" | "brand";
+  date: string;
+  read: boolean;
+};
+export type ClassAnalytics = {
+  class_id: string;
+  student_count: number;
+  attendance_rate: number;
+  average_score: number;
+  assignments_count: number;
+  teacher_assignments: number;
+  subject_scores: { subject: string; averageScore: number; entries: number }[];
+};
 
 type ApiList<T> = { data: T[] };
 type ApiItem<T> = { data: T };
@@ -55,6 +89,15 @@ export function useAttendance(studentId: string | undefined) {
     queryFn: () => apiGet<ApiList<Attendance>>(`/attendance/${studentId}`),
     select: (data) => data.data,
     enabled: !!studentId,
+  });
+}
+
+export function useClassAttendance(classId: string | undefined) {
+  return useQuery({
+    queryKey: ["attendance", "class", classId],
+    queryFn: () => apiGet<ApiList<Attendance>>(`/attendance/class/${classId}`),
+    select: (data) => data.data,
+    enabled: !!classId,
   });
 }
 
@@ -122,6 +165,40 @@ export function useCreatePayment() {
     onSuccess: (_data, variables) => {
       queryClient.invalidateQueries({ queryKey: ["fees", variables.student_id] });
     },
+  });
+}
+
+export function usePayments() {
+  return useQuery({
+    queryKey: ["payments"],
+    queryFn: () => apiGet<ApiList<PaymentRecord>>("/payments"),
+    select: (data) => data.data,
+  });
+}
+
+export function useTimetable() {
+  return useQuery({
+    queryKey: ["timetable"],
+    queryFn: () => apiGet<ApiList<TimetableEntry>>("/timetable"),
+    select: (data) => data.data,
+  });
+}
+
+export function useNotifications(studentId: string | undefined) {
+  return useQuery({
+    queryKey: ["notifications", studentId],
+    queryFn: () => apiGet<ApiList<NotificationItem>>(`/notifications/${studentId}`),
+    select: (data) => data.data,
+    enabled: !!studentId,
+  });
+}
+
+export function useClassAnalytics(classId: string | undefined) {
+  return useQuery({
+    queryKey: ["analytics", classId],
+    queryFn: () => apiGet<ApiItem<ClassAnalytics>>(`/analytics/class/${classId}`),
+    select: (data) => data.data,
+    enabled: !!classId,
   });
 }
 

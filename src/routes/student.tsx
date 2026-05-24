@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Outlet } from "@tanstack/react-router";
 import { motion } from "framer-motion";
 import { useMemo } from "react";
 import { LineChart, Line, XAxis, YAxis, ResponsiveContainer, Tooltip, CartesianGrid } from "recharts";
@@ -284,6 +284,8 @@ function StudentDashboard() {
           <PrimaryButton>Open Assistant</PrimaryButton>
         </div>
       </Card>
+
+      <Outlet />
     </RequireRole>
   );
 }

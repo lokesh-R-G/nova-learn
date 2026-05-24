@@ -1,12 +1,23 @@
 import { Fees } from "../models/Fees.js";
 import { Payment } from "../models/Payment.js";
 
+function logCount(label, count) {
+  console.log(`[api] ${label}: ${count} record(s)`);
+}
+
 export async function getFeesByStudent(req, res) {
   const record = await Fees.findOne({ student_id: req.params.studentId }, { _id: 0 }).lean();
   if (!record) {
     return res.status(404).json({ error: "Fees record not found." });
   }
+  logCount(`fees/student/${req.params.studentId}`, 1);
   return res.status(200).json({ data: record });
+}
+
+export async function getPayments(req, res) {
+  const payments = await Payment.find({}, { _id: 0 }).sort({ date: -1 }).lean();
+  logCount("payments", payments.length);
+  return res.status(200).json({ data: payments });
 }
 
 export async function createPayment(req, res) {
@@ -34,6 +45,8 @@ export async function createPayment(req, res) {
     fees.balance = Math.max(0, fees.total_fee - newPaid);
     await fees.save();
   }
+
+  console.log("[api] payments/create: 1 record");
 
   return res.status(201).json({ data: { ...payment.toObject(), _id: undefined } });
 }

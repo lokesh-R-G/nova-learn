@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Outlet } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { Search, Download, Filter, ArrowUpDown } from "lucide-react";
@@ -35,7 +35,7 @@ function AccountsDashboard() {
 
   const feesData = feesQueries
     .map((q) => q.data)
-    .filter(Boolean);
+    .filter((fee): fee is NonNullable<typeof fee> => Boolean(fee));
 
   const rowsBase = feesData.map((fee) => {
     const student = students?.find((s) => s.student_id === fee.student_id);
@@ -200,6 +200,8 @@ function AccountsDashboard() {
           </table>
         </div>
       </Card>
+
+      <Outlet />
       </RequireRole>
   );
 }

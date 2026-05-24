@@ -1,5 +1,9 @@
 import { Assignment } from "../models/Assignment.js";
 
+function logCount(label, count) {
+  console.log(`[api] ${label}: ${count} record(s)`);
+}
+
 function generateAssignmentId() {
   const stamp = Date.now().toString().slice(-6);
   return `A${stamp}`;
@@ -7,6 +11,7 @@ function generateAssignmentId() {
 
 export async function getAssignmentsByClass(req, res) {
   const records = await Assignment.find({ class_id: req.params.classId }, { _id: 0 }).lean();
+  logCount(`assignments/class/${req.params.classId}`, records.length);
   res.status(200).json({ data: records });
 }
 
@@ -22,6 +27,8 @@ export async function createAssignment(req, res) {
     subject,
     title,
   });
+
+  console.log("[api] assignments/create: 1 record");
 
   return res.status(201).json({ data: { ...record.toObject(), _id: undefined } });
 }
