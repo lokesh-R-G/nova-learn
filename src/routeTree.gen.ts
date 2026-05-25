@@ -16,6 +16,11 @@ import { Route as AssistantRouteImport } from './routes/assistant'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AccountsRouteImport } from './routes/accounts'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as TeacherIndexRouteImport } from './routes/teacher.index'
+import { Route as StudentIndexRouteImport } from './routes/student.index'
+import { Route as ParentIndexRouteImport } from './routes/parent.index'
+import { Route as AdminIndexRouteImport } from './routes/admin.index'
+import { Route as AccountsIndexRouteImport } from './routes/accounts.index'
 import { Route as TeacherInsightsRouteImport } from './routes/teacher.insights'
 import { Route as TeacherAttendanceRouteImport } from './routes/teacher.attendance'
 import { Route as TeacherAssignmentsRouteImport } from './routes/teacher.assignments'
@@ -63,6 +68,31 @@ const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const TeacherIndexRoute = TeacherIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => TeacherRoute,
+} as any)
+const StudentIndexRoute = StudentIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => StudentRoute,
+} as any)
+const ParentIndexRoute = ParentIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => ParentRoute,
+} as any)
+const AdminIndexRoute = AdminIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AccountsIndexRoute = AccountsIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AccountsRoute,
 } as any)
 const TeacherInsightsRoute = TeacherInsightsRouteImport.update({
   id: '/insights',
@@ -145,15 +175,15 @@ export interface FileRoutesByFullPath {
   '/teacher/assignments': typeof TeacherAssignmentsRoute
   '/teacher/attendance': typeof TeacherAttendanceRoute
   '/teacher/insights': typeof TeacherInsightsRoute
+  '/accounts/': typeof AccountsIndexRoute
+  '/admin/': typeof AdminIndexRoute
+  '/parent/': typeof ParentIndexRoute
+  '/student/': typeof StudentIndexRoute
+  '/teacher/': typeof TeacherIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/accounts': typeof AccountsRouteWithChildren
-  '/admin': typeof AdminRouteWithChildren
   '/assistant': typeof AssistantRoute
-  '/parent': typeof ParentRouteWithChildren
-  '/student': typeof StudentRouteWithChildren
-  '/teacher': typeof TeacherRouteWithChildren
   '/accounts/transactions': typeof AccountsTransactionsRoute
   '/admin/staff': typeof AdminStaffRoute
   '/admin/students': typeof AdminStudentsRoute
@@ -166,6 +196,11 @@ export interface FileRoutesByTo {
   '/teacher/assignments': typeof TeacherAssignmentsRoute
   '/teacher/attendance': typeof TeacherAttendanceRoute
   '/teacher/insights': typeof TeacherInsightsRoute
+  '/accounts': typeof AccountsIndexRoute
+  '/admin': typeof AdminIndexRoute
+  '/parent': typeof ParentIndexRoute
+  '/student': typeof StudentIndexRoute
+  '/teacher': typeof TeacherIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -188,6 +223,11 @@ export interface FileRoutesById {
   '/teacher/assignments': typeof TeacherAssignmentsRoute
   '/teacher/attendance': typeof TeacherAttendanceRoute
   '/teacher/insights': typeof TeacherInsightsRoute
+  '/accounts/': typeof AccountsIndexRoute
+  '/admin/': typeof AdminIndexRoute
+  '/parent/': typeof ParentIndexRoute
+  '/student/': typeof StudentIndexRoute
+  '/teacher/': typeof TeacherIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -211,15 +251,15 @@ export interface FileRouteTypes {
     | '/teacher/assignments'
     | '/teacher/attendance'
     | '/teacher/insights'
+    | '/accounts/'
+    | '/admin/'
+    | '/parent/'
+    | '/student/'
+    | '/teacher/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/accounts'
-    | '/admin'
     | '/assistant'
-    | '/parent'
-    | '/student'
-    | '/teacher'
     | '/accounts/transactions'
     | '/admin/staff'
     | '/admin/students'
@@ -232,6 +272,11 @@ export interface FileRouteTypes {
     | '/teacher/assignments'
     | '/teacher/attendance'
     | '/teacher/insights'
+    | '/accounts'
+    | '/admin'
+    | '/parent'
+    | '/student'
+    | '/teacher'
   id:
     | '__root__'
     | '/'
@@ -253,6 +298,11 @@ export interface FileRouteTypes {
     | '/teacher/assignments'
     | '/teacher/attendance'
     | '/teacher/insights'
+    | '/accounts/'
+    | '/admin/'
+    | '/parent/'
+    | '/student/'
+    | '/teacher/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -315,6 +365,41 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/teacher/': {
+      id: '/teacher/'
+      path: '/'
+      fullPath: '/teacher/'
+      preLoaderRoute: typeof TeacherIndexRouteImport
+      parentRoute: typeof TeacherRoute
+    }
+    '/student/': {
+      id: '/student/'
+      path: '/'
+      fullPath: '/student/'
+      preLoaderRoute: typeof StudentIndexRouteImport
+      parentRoute: typeof StudentRoute
+    }
+    '/parent/': {
+      id: '/parent/'
+      path: '/'
+      fullPath: '/parent/'
+      preLoaderRoute: typeof ParentIndexRouteImport
+      parentRoute: typeof ParentRoute
+    }
+    '/admin/': {
+      id: '/admin/'
+      path: '/'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AdminIndexRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/accounts/': {
+      id: '/accounts/'
+      path: '/'
+      fullPath: '/accounts/'
+      preLoaderRoute: typeof AccountsIndexRouteImport
+      parentRoute: typeof AccountsRoute
     }
     '/teacher/insights': {
       id: '/teacher/insights'
@@ -405,10 +490,12 @@ declare module '@tanstack/react-router' {
 
 interface AccountsRouteChildren {
   AccountsTransactionsRoute: typeof AccountsTransactionsRoute
+  AccountsIndexRoute: typeof AccountsIndexRoute
 }
 
 const AccountsRouteChildren: AccountsRouteChildren = {
   AccountsTransactionsRoute: AccountsTransactionsRoute,
+  AccountsIndexRoute: AccountsIndexRoute,
 }
 
 const AccountsRouteWithChildren = AccountsRoute._addFileChildren(
@@ -419,12 +506,14 @@ interface AdminRouteChildren {
   AdminStaffRoute: typeof AdminStaffRoute
   AdminStudentsRoute: typeof AdminStudentsRoute
   AdminTimetableRoute: typeof AdminTimetableRoute
+  AdminIndexRoute: typeof AdminIndexRoute
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
   AdminStaffRoute: AdminStaffRoute,
   AdminStudentsRoute: AdminStudentsRoute,
   AdminTimetableRoute: AdminTimetableRoute,
+  AdminIndexRoute: AdminIndexRoute,
 }
 
 const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
@@ -432,11 +521,13 @@ const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 interface ParentRouteChildren {
   ParentAttendanceRoute: typeof ParentAttendanceRoute
   ParentNotificationsRoute: typeof ParentNotificationsRoute
+  ParentIndexRoute: typeof ParentIndexRoute
 }
 
 const ParentRouteChildren: ParentRouteChildren = {
   ParentAttendanceRoute: ParentAttendanceRoute,
   ParentNotificationsRoute: ParentNotificationsRoute,
+  ParentIndexRoute: ParentIndexRoute,
 }
 
 const ParentRouteWithChildren =
@@ -446,12 +537,14 @@ interface StudentRouteChildren {
   StudentAssignmentsRoute: typeof StudentAssignmentsRoute
   StudentAttendanceRoute: typeof StudentAttendanceRoute
   StudentSubjectsRoute: typeof StudentSubjectsRoute
+  StudentIndexRoute: typeof StudentIndexRoute
 }
 
 const StudentRouteChildren: StudentRouteChildren = {
   StudentAssignmentsRoute: StudentAssignmentsRoute,
   StudentAttendanceRoute: StudentAttendanceRoute,
   StudentSubjectsRoute: StudentSubjectsRoute,
+  StudentIndexRoute: StudentIndexRoute,
 }
 
 const StudentRouteWithChildren =
@@ -461,12 +554,14 @@ interface TeacherRouteChildren {
   TeacherAssignmentsRoute: typeof TeacherAssignmentsRoute
   TeacherAttendanceRoute: typeof TeacherAttendanceRoute
   TeacherInsightsRoute: typeof TeacherInsightsRoute
+  TeacherIndexRoute: typeof TeacherIndexRoute
 }
 
 const TeacherRouteChildren: TeacherRouteChildren = {
   TeacherAssignmentsRoute: TeacherAssignmentsRoute,
   TeacherAttendanceRoute: TeacherAttendanceRoute,
   TeacherInsightsRoute: TeacherInsightsRoute,
+  TeacherIndexRoute: TeacherIndexRoute,
 }
 
 const TeacherRouteWithChildren =
